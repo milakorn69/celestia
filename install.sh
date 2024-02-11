@@ -17,7 +17,7 @@ cd $HOME
 rm -rf celestia-app 
 git clone https://github.com/celestiaorg/celestia-app.git 
 cd celestia-app/ 
-APP_VERSION=v1.3.0 
+APP_VERSION=v1.6.0 
 git checkout tags/$APP_VERSION -b $APP_VERSION 
 make install
 
@@ -25,6 +25,7 @@ cd $HOME
 rm -rf networks
 git clone https://github.com/celestiaorg/networks.git
 
+cd celestia-app
 celestia-appd config node tcp://localhost:${CELESTIA_PORT}657
 celestia-appd config keyring-backend os
 celestia-appd config chain-id $CHAIN_ID
