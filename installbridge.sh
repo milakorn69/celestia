@@ -8,15 +8,15 @@ mv $HOME/celestia-node/cel-key /usr/local/bin/
 cel-key add bridge_wallet --keyring-backend test --node.type bridge --p2p.network mocha
 cel-key list --node.type bridge --keyring-backend test --p2p.network mocha
 celestia bridge init \
-  --p2p.network blockspacerace \
+  --p2p.network mocha \
   --core.ip http://localhost \
   --core.rpc.port 26657 \
   --core.grpc.port 9090 \
   --gateway \
   --gateway.addr 0.0.0.0 \
-  --gateway.port 26659 \
+  --gateway.port 29659 \
   --rpc.addr 0.0.0.0 \
-  --rpc.port 26658 \
+  --rpc.port 29658 \
   --keyring.accname bridge_wallet
 tee <<EOF >/dev/null /etc/systemd/system/celestia-bridge.service
 [Unit]
@@ -29,7 +29,7 @@ ExecStart=$(which celestia) bridge start \
   --p2p.network blockspacerace \
   --gateway \
   --gateway.addr 0.0.0.0 \
-  --gateway.port 26659 \
+  --gateway.port 29659 \
   --metrics.tls=false \
   --metrics \
   --metrics.endpoint otel.celestia.tools:4318
