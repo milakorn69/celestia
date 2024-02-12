@@ -44,7 +44,16 @@ sed -i -e "s/^pruning *=.*/pruning = \"$pruning\"/" $HOME/.celestia-app/config/a
 sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"$pruning_keep_recent\"/" $HOME/.celestia-app/config/app.toml && \
 sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"$pruning_interval\"/" $HOME/.celestia-app/config/app.toml
 
-tee /etc/systemd/system/celestia-appd.service > /dev/null <<EOF
+cd $HOME
+sudo apt install aria2 -y
+rm -rf ~/.celestia-app/data
+mkdir -p ~/.celestia-app/data
+SNAP_NAME=$(curl -s https://snaps.qubelabs.io/celestia/ | \
+    egrep -o ">mocha-4.*tar" | tr -d ">")
+aria2c -x 16 -s 16 -o celestia-snap.tar "https://snaps.qubelabs.io/celestia/${SNAP_NAME}"
+tar xf celestia-snap.tar -C ~/.celestia-app/data/
+
+sudo tee /etc/systemd/system/celestia-appd.service > /dev/null <<EOF
 [Unit]
 Description=celestia-appd
 After=network-online.target
