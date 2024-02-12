@@ -35,12 +35,6 @@ cd $HOME
 rm -rf networks
 git clone https://github.com/celestiaorg/networks.git
 
-cd $HOME
-rm -rf networks
-git clone https://github.com/celestiaorg/networks.git
-
-
-
 celestia-appd config node tcp://localhost:${CELESTIA_PORT}657
 celestia-appd config keyring-backend os
 celestia-appd config chain-id $CHAIN_ID
