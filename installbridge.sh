@@ -18,6 +18,7 @@ celestia bridge init \
   --rpc.addr 0.0.0.0 \
   --rpc.port 29658 \
   --keyring.accname bridge_wallet
+
 tee <<EOF >/dev/null /etc/systemd/system/celestia-bridge.service
 [Unit]
 Description=celestia-bridge Cosmos daemon
