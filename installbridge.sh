@@ -1,9 +1,14 @@
 #!/bin/bash
 git clone https://github.com/celestiaorg/celestia-node && cd celestia-node
+
 git checkout tags/v0.12.4
+
 make build
+
 make install
+
 make cel-key
+
 mv $HOME/celestia-node/cel-key /usr/local/bin/ 
 cel-key add bridge_wallet --keyring-backend test --node.type bridge --p2p.network mocha
 cel-key list --node.type bridge --keyring-backend test --p2p.network mocha
