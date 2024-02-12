@@ -19,9 +19,9 @@ celestia bridge init \
   --core.grpc.port 9090 \
   --gateway \
   --gateway.addr 0.0.0.0 \
-  --gateway.port 29659 \
+  --gateway.port 26659 \
   --rpc.addr 0.0.0.0 \
-  --rpc.port 29658 \
+  --rpc.port 26658 \
   --keyring.accname bridge_wallet
 
 tee <<EOF >/dev/null /etc/systemd/system/celestia-bridge.service
@@ -35,7 +35,7 @@ ExecStart=$(which celestia) bridge start \
   --p2p.network mocha \
   --gateway \
   --gateway.addr 0.0.0.0 \
-  --gateway.port 29659 \
+  --gateway.port 26659 \
   --metrics.tls=false \
   --metrics \
   --metrics.endpoint otel.celestia.tools:4318
