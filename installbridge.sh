@@ -32,7 +32,7 @@ After=network-online.target
 [Service]
 User=$USER
 ExecStart=$(which celestia) bridge start \
-  --p2p.network blockspacerace \
+  --p2p.network mocha \
   --gateway \
   --gateway.addr 0.0.0.0 \
   --gateway.port 29659 \
