@@ -44,7 +44,7 @@ wget -O $HOME/.celestia-app/config/genesis.json https://snapshots.kjnodes.com/ce
 wget -O $HOME/.celestia-app/config/addrbook.json https://snapshots.kjnodes.com/celestia/addrbook.json
 
 SEEDS="400f3d9e30b69e78a7fb891f60d76fa3c73f0ecc@celestia.rpc.kjnodes.com:12059"
-PEERS="5001de72be39622c9dc34f2117eccc3f3fca8a7a@34.91.84.93:26756"
+PEERS="5001de72be39622c9dc34f2117eccc3f3fca8a7a@34.91.84.93:26756,ff476823607d3c73da21662238083b10040d3ecc@65.108.44.124:26001,24a607a217cf12be29bae5b2e8151391bde2d8c8@65.108.12.253:15007,d7adf0cf48c95224c2440072b75b91fd55bfb83f@49.12.83.235:26656,fa759f8aad712dd59ec673e3fbb434e4c959e509@3.125.200.144:26656"
 sed -i -e 's|^seeds *=.*|seeds = "'$SEEDS'"|; s|^persistent_peers *=.*|persistent_peers = "'$PEERS'"|' $HOME/.celestia-app/config/config.toml
 
 
