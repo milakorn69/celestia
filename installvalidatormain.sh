@@ -40,10 +40,10 @@ celestia-appd config keyring-backend os
 celestia-appd config chain-id $CHAIN_ID
 celestia-appd init ERN --chain-id celestia
 
-curl -Ls https://snapshots.kjnodes.com/celestia/genesis.json > $HOME/.celestia-app/config/genesis.json
-curl -Ls https://snapshots.kjnodes.com/celestia/addrbook.json > $HOME/.celestia-app/config/addrbook.json
+wget -O $HOME/.celestia-app/config/genesis.json https://snapshots.kjnodes.com/celestia/genesis.json
+wget -O $HOME/.celestia-app/config/addrbook.json https://snapshots.kjnodes.com/celestia/addrbook.json
 
-SEEDS="400f3d9e30b69e78a7fb891f60d76fa3c73f0ecc@celestia.rpc.kjnodes.com:12059\"
+SEEDS="400f3d9e30b69e78a7fb891f60d76fa3c73f0ecc@celestia.rpc.kjnodes.com:12059"
 PEERS="5001de72be39622c9dc34f2117eccc3f3fca8a7a@34.91.84.93:26756"
 sed -i -e 's|^seeds *=.*|seeds = "'$SEEDS'"|; s|^persistent_peers *=.*|persistent_peers = "'$PEERS'"|' $HOME/.celestia-app/config/config.toml
 
