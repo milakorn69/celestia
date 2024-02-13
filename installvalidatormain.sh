@@ -5,7 +5,7 @@ sudo apt install curl git wget htop tmux build-essential jq make gcc -y
 CELESTIA_PORT=26
 echo "export WALLET="ERN" >> $HOME/.bash_profile
 echo "export MONIKER="ERN" >> $HOME/.bash_profile
-echo "export CHAIN_ID="celestia" >> $HOME/.bash_profile
+echo "export CHAIN_ID="celestia"" >> $HOME/.bash_profile
 echo "export CELESTIA_PORT="${CELESTIA_PORT}"" >> $HOME/.bash_profile
 source $HOME/.bash_profile
 
