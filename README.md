@@ -13,7 +13,7 @@ source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/insta
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installbridgemain.sh)
 
 # sudo ufw enable
-#sudo ufw default allow outgoing 
+sudo ufw default allow outgoing 
 #  sudo ufw default deny incoming 
 #  sudo ufw allow ssh/tcp 
 #  sudo ufw allow 26658,2121/tcp
