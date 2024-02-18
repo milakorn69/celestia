@@ -1,6 +1,6 @@
 # Celestia
 <div>
-<h1 align="left" style="display: flex;"> Celestia node Setup for Mocha-4 Testnet and Celestia mainnet — mocha-4</h1>
+<h1 align="left" style="display: flex;"> Celestia node Setup for Mocha-4 Testnet and Celestia mainnet</h1>
 <img src="https://avatars.githubusercontent.com/u/54859940?s=200&v=4"  style="float: right;" width="100" height="100"></img>
 </div>
 
