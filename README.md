@@ -7,7 +7,9 @@
 Official documentation:
 >- [Validator setup instructions](https://docs.celestia.org/nodes/consensus-node)
 # install test validator
+~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installvalidatortest.sh)
+~~~
 # install main validator
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installvalidatormain.sh)
 # install full test node
