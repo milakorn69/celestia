@@ -1,4 +1,11 @@
 # Celestia
+<div>
+<h1 align="left" style="display: flex;"> Celestia Consensus Full node Setup for Mocha-4 Testnet — mocha-4</h1>
+<img src="https://avatars.githubusercontent.com/u/54859940?s=200&v=4"  style="float: right;" width="100" height="100"></img>
+</div>
+
+Official documentation:
+>- [Validator setup instructions](https://docs.celestia.org/nodes/consensus-node)
 # install test validator
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installvalidatortest.sh)
 # install main validator
