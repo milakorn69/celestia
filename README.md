@@ -11,15 +11,25 @@ Official documentation:
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installvalidatortest.sh)
 ~~~
 # install main validator
+~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installvalidatormain.sh)
+~~~
 # install full test node
+~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installfulltest.sh)
+~~~
 # install full main node
+~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installfullmain.sh)
-# install test bridge 
+~~~
+# install test bridge
+~~~bash 
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installbridgetest.sh)
-# install main bridge 
+~~~
+# install main bridge
+~~~bash 
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installbridgemain.sh)
+~~~
 
 ### Firewall security
 Set the default to allow outgoing connections, deny all incoming, allow ssh and node p2p port
