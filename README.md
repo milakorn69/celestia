@@ -19,10 +19,13 @@ source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/insta
 # install main bridge 
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installbridgemain.sh)
 
-# UFW
+### Firewall security
+Set the default to allow outgoing connections, deny all incoming, allow ssh and node p2p port
+  ~~~bash
   sudo ufw enable 
   sudo ufw default allow outgoing 
   sudo ufw default deny incoming 
   sudo ufw allow ssh/tcp 
   sudo ufw allow 26658,2121/tcp 
   sudo ufw allow 2121/udp 
+  ~~~
