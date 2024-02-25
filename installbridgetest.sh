@@ -38,7 +38,7 @@ ExecStart=$(which celestia) bridge start \
   --gateway.port 26659 \
   --metrics.tls=false \
   --metrics \
-  --metrics.endpoint otel.celestia.tools:4318
+  --metrics.endpoint localhost:4318
 Restart=on-failure
 RestartSec=3
 LimitNOFILE=65535
