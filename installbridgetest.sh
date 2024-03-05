@@ -36,9 +36,9 @@ ExecStart=$(which celestia) bridge start \
   --gateway \
   --gateway.addr 0.0.0.0 \
   --gateway.port 26659 \
-  --metrics.tls=false \
+  --metrics.tls=true \
   --metrics \
-  --metrics.endpoint localhost:4318
+  --metrics.endpoint otel.celestia-mocha.com
 Restart=on-failure
 RestartSec=3
 LimitNOFILE=65535
