@@ -10,6 +10,10 @@ Official documentation:
 ~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/upgradeapp.sh)
 ~~~
+# upgrade celestia node
+~~~bash
+source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/upgradenode.sh)
+~~~
 # install test validator
 ~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installvalidatortest.sh)
