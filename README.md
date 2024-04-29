@@ -8,7 +8,7 @@ Official documentation:
 >- [Validator setup instructions](https://docs.celestia.org/nodes/consensus-node)
 # upgrade celestia app
 ~~~bash
-source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/upgradeup.sh)
+source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/upgradeapp.sh)
 # install test validator
 ~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installvalidatortest.sh)
