@@ -9,6 +9,7 @@ Official documentation:
 # upgrade celestia app
 ~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/upgradeapp.sh)
+~~~
 # install test validator
 ~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installvalidatortest.sh)
