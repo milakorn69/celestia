@@ -25,8 +25,8 @@ git clone https://github.com/celestiaorg/networks
 
 celestia-appd init ERN --chain-id mocha-4
 
-wget -O $HOME/.celestia-app/config/genesis.json https://testnet-files.itrocket.net/celestia/genesis.json
-wget -O $HOME/.celestia-app/config/addrbook.json https://testnet-files.itrocket.net/celestia/addrbook.json
+wget -O $HOME/.celestia-app/config/genesis.json https://testnets.services-ernventures.com/celestia/genesis.json
+wget -O $HOME/.celestia-app/config/addrbook.json https://testnets.services-ernventures.com/celestia/addrbook.json
 
 sed -i.bak -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0.002utia\"/;" ~/.celestia-app/config/app.toml
 
@@ -34,7 +34,7 @@ EXTERNAL_ADDRESS=$(wget -qO- eth0.me)
 sed -i.bak -e "s/^external_address = \"\"/external_address = \"$EXTERNAL_ADDRESS:26656\"/" $HOME/.celestia-app/config/config.toml
 
 SEEDS="5d0bf034d6e6a8b5ee31a2f42f753f1107b3a00e@celestia-testnet-seed.itrocket.net:11656"
-PEERS="daf2cecee2bd7f1b3bf94839f993f807c6b15fbf@celestia-testnet-peer.itrocket.net:11656"
+PEERS="77f8a816610d521cecb4c62f834891e1a6257b09@65.108.207.143:26656"
 sed -i -e 's|^seeds *=.*|seeds = "'$SEEDS'"|; s|^persistent_peers *=.*|persistent_peers = "'$PEERS'"|' $HOME/.celestia-app/config/config.toml
 
 pruning="nothing"
@@ -48,10 +48,7 @@ cd $HOME
 sudo apt install aria2 -y
 rm -rf ~/.celestia-app/data
 mkdir -p ~/.celestia-app/data
-SNAP_NAME=$(curl -s https://snaps.qubelabs.io/celestia/ | \
-    egrep -o ">mocha-4.*tar" | tr -d ">")
-aria2c -x 16 -s 16 -o celestia-snap.tar "https://snaps.qubelabs.io/celestia/${SNAP_NAME}"
-tar xf celestia-snap.tar -C ~/.celestia-app/data/
+wget -O snap_celestia.tar.lz4 https://testnets.services-ernventures.com/celestia/snap_celestia.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.celestia-app/data
 
 sudo tee /etc/systemd/system/celestia-appd.service > /dev/null <<EOF
 [Unit]
