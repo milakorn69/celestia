@@ -64,7 +64,7 @@ sudo groupadd --system Grafana
 sudo usermod -aG Grafana grafana
 
 sudo apt-get install -y adduser libfontconfig1
-wget https://dl.grafana.com/enterprise/release/grafana-enterprise_9.3.2_amd64.deb
+sudo wget https://dl.grafana.com/enterprise/release/grafana-enterprise_9.3.2_amd64.deb
 sudo dpkg -i grafana-enterprise_9.3.2_amd64.deb
 
 sudo systemctl daemon-reload
