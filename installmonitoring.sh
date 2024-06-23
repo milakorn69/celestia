@@ -1,25 +1,48 @@
 #!/bin/bash
 sudo apt update && sudo apt upgrade -y
 
-sudo apt install curl iptables build-essential git wget jq make gcc nano tmux htop nvme-cli pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip libleveldb-dev -y
-sudo apt install python3-pip -y
-sudo pip install yq
+sudo wget $(curl -s https://api.github.com/repos/prometheus/node_exporter/releases/latest |grep "tag_name" | awk '{print "https://github.com/prometheus/node_exporter/releases/download/" substr($2, 2, length($2)-3) "/node_exporter-" substr($2, 3, length($2)-4) ".linux-amd64.tar.gz"}')
 
-sudo useradd -m -s /bin/bash Prometheus 
-sudo groupadd --system Prometheus  
-sudo usermod -aG Prometheus Prometheus
+sudo tar xvf node_exporter-*.tar.gz
+sudo cp ./node_exporter-*.linux-amd64/node_exporter /usr/local/bin/
 
+sudo useradd --no-create-home --shell /usr/sbin/nologin node_exporter
+
+sudo rm -rf ./node_exporter*
+
+sudo tee /etc/systemd/system/node_exporter.service > /dev/null <<EOF
+[Unit]
+  Description=Node Exporter
+  Wants=network-online.target
+  After=network-online.target
+[Service] 
+  User=node_exporter
+  Group=node_exporter
+  Type=simple
+  ExecStart=/usr/local/bin/node_exporter
+[Install]
+  WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl start node_exporter.service
+sudo systemctl enable node_exporter.service
+
+sudo wget $(curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest |grep "tag_name" | awk '{print "https://github.com/prometheus/prometheus/releases/download/" substr($2, 2, length($2)-3) "/prometheus-" substr($2, 3, length($2)-4) ".linux-amd64.tar.gz"}')
+
+sudo tar xvf prometheus-*.tar.gz
+sudo cp ./prometheus-*.linux-amd64/prometheus /usr/local/bin/
+sudo cp ./prometheus-*.linux-amd64/promtool /usr/local/bin/ 
+sudo cp -r ./prometheus-*.linux-amd64/consoles /etc/prometheus
+sudo cp -r ./prometheus-*.linux-amd64/console_libraries /etc/prometheus
+
+sudo useradd --no-create-home --shell /usr/sbin/nologin prometheus
 sudo mkdir /var/lib/prometheus
-sudo apt install prometheus
-sudo mkdir -p /tmp/prometheus && cd /tmp/prometheus
-sudo curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest | grep browser_download_url | grep linux-amd64 | cut -d '"' -f 4 | xargs wget
 
-sudo tar xvf prometheus*.tar.gz
-cd prometheus*/
-sudo mv prometheus promtool /usr/local/bin/
+sudo chown -R prometheus:prometheus /etc/prometheus
+sudo chown -R prometheus:prometheus /var/lib/prometheus
 
-sudo mv prometheus.yml /etc/prometheus/prometheus.yml
-sudo mv consoles/ console_libraries/ /etc/prometheus/
+sudo rm -rf ./prometheus*
 
 sudo tee /etc/systemd/system/prometheus.service<<EOF
 [Unit]
@@ -48,10 +71,12 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 
-sudo mv prometheus.yml /etc/prometheus/prometheus.yml
-sudo mv consoles/ console_libraries/ /etc/prometheus/
+cd /etc/prometheus
+sudo chown prometheus:prometheus rules.yml
 
-sudo systemctl daemon-reload && systemctl enable prometheusd && systemctl restart prometheusd
+sudo systemctl daemon-reload
+sudo systemctl start prometheus.service
+sudo systemctl enable prometheus.service
 
 sudo apt-get install -y apt-transport-https
 sudo apt-get install -y software-properties-common wget
