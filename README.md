@@ -38,6 +38,12 @@ source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/insta
 ~~~bash 
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installbridgemain.sh)
 ~~~
+# install monitoring
+~~~bash 
+source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installmonitoring.sh)
+~~~
+
+
 
 ### Firewall security
 Set the default to allow outgoing connections, deny all incoming, allow ssh and node p2p port
