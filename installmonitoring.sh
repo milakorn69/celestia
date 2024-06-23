@@ -3,14 +3,14 @@ sudo apt update && sudo apt upgrade -y
 
 sudo apt install curl iptables build-essential git wget jq make gcc nano tmux htop nvme-cli pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip libleveldb-dev -y
 sudo apt install python3-pip -y
-pip install yq
+sudo pip install yq
 
 sudo useradd -m -s /bin/bash Prometheus 
 sudo groupadd --system Prometheus  
 sudo usermod -aG Prometheus Prometheus
 
 sudo mkdir /var/lib/prometheus
-for i in rules rules.d files_sd; do sudo mkdir -p /etc/prometheus/${i}; done
+sudo apt install prometheus
 sudo mkdir -p /tmp/prometheus && cd /tmp/prometheus
 sudo curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest | grep browser_download_url | grep linux-amd64 | cut -d '"' -f 4 | xargs wget
 
