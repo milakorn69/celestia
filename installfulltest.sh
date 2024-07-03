@@ -45,7 +45,7 @@ sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"$pruning_keep_rec
 sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"$pruning_interval\"/" $HOME/.celestia-app/config/app.toml
 
 cd $HOME
-sudo apt install aria2 -y
+sudo apt install lz4 -y
 rm -rf ~/.celestia-app/data
 mkdir -p ~/.celestia-app/data
 wget -O snap_celestia.tar.lz4 https://testnets.services-ernventures.com/celestia/snap_celestia.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.celestia-app/data
