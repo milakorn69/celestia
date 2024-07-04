@@ -91,7 +91,11 @@ LimitNOFILE=65535
 WantedBy=multi-user.target
 EOF
 
-curl https://testnet-files.itrocket.net/celestia/snap_celestia.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.celestia-app
+cd $HOME
+sudo apt install lz4 -y
+rm -rf ~/.celestia-app/data
+mkdir -p ~/.celestia-app/data
+wget -O snap_celestia.tar.lz4 https://testnets.services-ernventures.com/celestia/snap_celestia-prun.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.celestia-app/data
 
 sudo systemctl daemon-reload
 sudo systemctl enable celestia-appd
