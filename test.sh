@@ -53,10 +53,11 @@ NODE_IPS=(
 "65.109.16.220"
 "15.235.218.151"
 "88.198.12.182"
-"celestia-testnet-rpc.itrocket.net"
-"celestia-testnet.rpc.kjnodes.com"
-"celestia-testnet-rpc.stake-town.com"
-"celestia.test.rpc.nodeshub.online"
+"https://celestia-testnet-rpc.itrocket.net/"
+"https://celestia-testnet.rpc.kjnodes.com/"
+"https://celestia-testnet-rpc.stake-town.com/"
+"https://celestia.test.rpc.nodeshub.online/"
+"https://celestia.rpc.testnets.services-ernventures.com/"
 )
 
 # Порт для опроса
@@ -85,6 +86,7 @@ PORTS=(
     "12045"
     "12065"
     "12066"
+    "443"
 )
 
 # Получаем список валидаторов
