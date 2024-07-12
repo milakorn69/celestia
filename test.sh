@@ -127,6 +127,7 @@ for NODE_IP in "${NODE_IPS[@]}"; do
         
         if echo "$response" | jq empty &> /dev/null; then
             echo "$response" | jq -r '.result.peers[] | .node_info.moniker + " " + .remote_ip' >> peers.txt
+            break  # Выходим из внутреннего цикла после получения первого IP
         else
             echo "Нет данных от узла $NODE_IP:$PORT"
         fi
@@ -144,7 +145,7 @@ echo "Список валидаторов и их IP-адресов:" > result.t
 while read -r validator; do
     moniker=$(echo "$validator" | awk '{print $1}')
     address=$(echo "$validator" | awk '{print $2}')
-    ip_list=$(grep "$moniker" peers.txt | awk '{print $2}' | sort | uniq)
+    ip_list=$(grep "$moniker" peers.txt | awk '{print $2}' | sort | uniq | head -n 1)  # Получаем только первый IP
     if [[ -n "$ip_list" ]]; then
         echo "Валидатор: $moniker, Адрес: $address, IP: $ip_list" | tee -a result.txt
     else
