@@ -109,14 +109,16 @@ cat peers.txt
 # Парсинг JSON и сопоставление валидаторов и IP-адресов
 echo "$validators" | jq -r '.validators[] | .description.moniker + " " + .operator_address' > validators.txt
 
-echo "Список валидаторов и их IP-адресов:"
+echo "Список валидаторов и их IP-адресов:" > result.txt
 while read -r validator; do
     moniker=$(echo "$validator" | awk '{print $1}')
     address=$(echo "$validator" | awk '{print $2}')
     ip_list=$(grep "$moniker" peers.txt | awk '{print $2}' | sort | uniq)
     if [[ -n "$ip_list" ]]; then
-        echo "Валидатор: $moniker, Адрес: $address, IP: $ip_list"
+        echo "Валидатор: $moniker, Адрес: $address, IP: $ip_list" | tee -a result.txt
     else
-        echo "Для валидатора $moniker не найдено IP-адресов."
+        echo "Для валидатора $moniker не найдено IP-адресов." | tee -a result.txt
     fi
 done < validators.txt
+
+echo "Результаты сохранены в файл result.txt"
