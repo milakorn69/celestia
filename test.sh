@@ -11,7 +11,7 @@ NODE_IPS=(
     "136.243.176.86"
 )
 
-# Список портов для опроса
+# Порт для опроса
 RPC_PORT="26657"
 
 # Получаем список валидаторов
@@ -28,12 +28,10 @@ fi
 
 # Получаем информацию о пирах с нескольких узлов и портов
 for NODE_IP in "${NODE_IPS[@]}"; do
-    for PORT in "${PORTS[@]}"; do
-        response=$(curl -s http://$NODE_IP:$PORT/net_info)
-        if echo "$response" | jq empty &> /dev/null; then
-            echo "$response" | jq -r '.result.peers[] | .node_info.moniker + " " + .remote_ip' >> peers.txt
-        fi
-    done
+    response=$(curl -s http://$NODE_IP:$RPC_PORT/net_info)
+    if echo "$response" | jq empty &> /dev/null; then
+        echo "$response" | jq -r '.result.peers[] | .node_info.moniker + " " + .remote_ip' >> peers.txt
+    fi
 done
 
 # Парсинг JSON и сопоставление валидаторов и IP-адресов
