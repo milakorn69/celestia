@@ -1,7 +1,5 @@
 #!/bin/bash
 
-start_time=$(date +%s)
-
 # Проверка, установлен ли jq и curl
 if ! command -v jq &> /dev/null || ! command -v curl &> /dev/null; then
     echo "jq или curl не установлены. Установите их и попробуйте снова."
@@ -92,7 +90,3 @@ while read -r validator; do
         echo "Валидатор: $moniker, Адрес: $address, IP: $ip_list"
     fi
 done < validators.txt
-
-end_time=$(date +%s)
-execution_time=$((end_time - start_time))
-echo "Время выполнения: $execution_time секунд"
