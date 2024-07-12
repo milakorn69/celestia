@@ -84,6 +84,12 @@ for NODE_IP in "${NODE_IPS[@]}"; do
             continue
         fi
         
+        # Проверка на пустой ответ
+        if [[ -z "$response" ]]; then
+            echo "Пустой ответ от узла $NODE_IP:$PORT."
+            continue
+        fi
+
         # Выводим ответ для отладки
         echo "Ответ от узла $NODE_IP:$PORT:"
         echo "$response" | jq .
