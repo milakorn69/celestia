@@ -76,7 +76,13 @@ echo "$validators" | jq .
 for NODE_IP in "${NODE_IPS[@]}"; do
     for PORT in "${PORTS[@]}"; do
         echo "Запрашиваем информацию у узла $NODE_IP на порту $PORT..."
-        response=$(curl -s --max-time 10 http://$NODE_IP:$PORT/net_info)
+        response=$(curl -s --max-time 10 --connect-timeout 5 http://$NODE_IP:$PORT/net_info)
+        
+        # Проверка статуса ответа
+        if [[ $? -ne 0 ]]; then
+            echo "Не удалось получить ответ от узла $NODE_IP:$PORT в течение заданного времени."
+            continue
+        fi
         
         # Выводим ответ для отладки
         echo "Ответ от узла $NODE_IP:$PORT:"
