@@ -74,18 +74,20 @@ echo "$validators" | jq .
 
 # Получаем информацию о пирах с нескольких узлов и портов
 for NODE_IP in "${NODE_IPS[@]}"; do
-    echo "Запрашиваем информацию у узла $NODE_IP на порту $RPC_PORT..."
-    response=$(curl -s http://$NODE_IP:$RPC_PORT/net_info)
-    
-    # Выводим ответ для отладки
-    echo "Ответ от узла:"
-    echo "$response" | jq .
-    
-    if echo "$response" | jq empty &> /dev/null; then
-        echo "$response" | jq -r '.result.peers[] | .node_info.moniker + " " + .remote_ip' >> peers.txt
-    else
-        echo "Нет данных от узла $NODE_IP:$RPC_PORT"
-    fi
+    for PORT in "${PORTS[@]}"; do
+        echo "Запрашиваем информацию у узла $NODE_IP на порту $PORT..."
+        response=$(curl -s http://$NODE_IP:$PORT/net_info)
+        
+        # Выводим ответ для отладки
+        echo "Ответ от узла $NODE_IP:$PORT:"
+        echo "$response" | jq .
+        
+        if echo "$response" | jq empty &> /dev/null; then
+            echo "$response" | jq -r '.result.peers[] | .node_info.moniker + " " + .remote_ip' >> peers.txt
+        else
+            echo "Нет данных от узла $NODE_IP:$PORT"
+        fi
+    done
 done
 
 # Проверка содержимого файла peers.txt
