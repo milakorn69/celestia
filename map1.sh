@@ -68,6 +68,20 @@ NODE_IPS=(
 "136.243.95.125"
 "65.21.227.52"
 "65.108.142.147"
+"162.19.19.41"
+"5.9.10.222"
+"64.176.57.63"
+"57.129.1.77"
+"37.27.119.173"
+"116.202.217.20"
+"62.138.24.120"
+"88.99.219.120"
+"95.216.223.149"
+"125.253.92.7"
+"64.227.18.169"
+"45.143.198.5"
+"95.217.200.98"
+"162.55.65.137"
 "https://celestia-testnet-rpc.itrocket.net/"
 "https://celestia-testnet.rpc.kjnodes.com/"
 "https://celestia-testnet-rpc.stake-town.com/"
@@ -108,6 +122,7 @@ PORTS=(
     "26000"
     "26756"
     "56656"
+    "26647"
 )
 
 # Получаем список валидаторов
@@ -180,10 +195,21 @@ echo "Результаты сохранены в файл result.txt"
 
 # Получение геолокационных данных для IP-адресов
 echo "Получение геолокационных данных..."
+> geo_results.txt  # Инициализация файла
 while read -r line; do
     ip=$(echo "$line" | awk '{print $NF}')
+    echo "Запрашиваем геолокацию для IP: $ip..."
     geo_info=$(curl -s ipinfo.io/$ip)
-    echo "$line $geo_info" | jq -r '"\(.Validator), \(.IP), \(.city), \(.region), \(.country), \(.loc)"' >> geo_results.txt
+    echo "Ответ от ipinfo.io: $geo_info"  # Выводим ответ для отладки
+    if [[ -n "$geo_info" ]]; then
+        city=$(echo "$geo_info" | jq -r '.city')
+        region=$(echo "$geo_info" | jq -r '.region')
+        country=$(echo "$geo_info" | jq -r '.country')
+        loc=$(echo "$geo_info" | jq -r '.loc')
+        echo "$line, $city, $region, $country, $loc" >> geo_results.txt
+    else
+        echo "$line, , , , " >> geo_results.txt
+    fi
 done < result.txt
 
 echo "Геолокационные данные сохранены в файл geo_results.txt"
