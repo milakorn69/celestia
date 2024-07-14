@@ -68,20 +68,6 @@ NODE_IPS=(
 "136.243.95.125"
 "65.21.227.52"
 "65.108.142.147"
-"162.19.19.41"
-"5.9.10.222"
-"64.176.57.63"
-"57.129.1.77"
-"37.27.119.173"
-"116.202.217.20"
-"62.138.24.120"
-"88.99.219.120"
-"95.216.223.149"
-"125.253.92.7"
-"64.227.18.169"
-"45.143.198.5"
-"95.217.200.98"
-"162.55.65.137"
 "https://celestia-testnet-rpc.itrocket.net/"
 "https://celestia-testnet.rpc.kjnodes.com/"
 "https://celestia-testnet-rpc.stake-town.com/"
@@ -122,7 +108,6 @@ PORTS=(
     "26000"
     "26756"
     "56656"
-    "26647"
 )
 
 # Получаем список валидаторов
@@ -206,7 +191,11 @@ while read -r line; do
         region=$(echo "$geo_info" | jq -r '.region')
         country=$(echo "$geo_info" | jq -r '.country')
         loc=$(echo "$geo_info" | jq -r '.loc')
-        echo "$line, $city, $region, $country, $loc" >> geo_results.txt
+        if [[ -n "$city" && -n "$region" && -n "$country" && -n "$loc" ]]; then
+            echo "$line, $city, $region, $country, $loc" >> geo_results.txt
+        else
+            echo "$line, , , , " >> geo_results.txt
+        fi
     else
         echo "$line, , , , " >> geo_results.txt
     fi
