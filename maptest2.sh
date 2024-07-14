@@ -133,7 +133,7 @@ while read -r validator; do
     if [[ -n "$ip_list" ]]; then
         echo "Валидатор: $moniker, Адрес: $address, IP: $ip_list" | tee -a result.txt
     else
-        echo "Для валидатора $moniker не найдено IP-адресов." | tee -a result.txt
+        echo "Валидатор: $moniker, Адрес: $address, IP: None" | tee -a result.txt
     fi
 done < validators.txt
 
@@ -144,16 +144,20 @@ echo "Получение геолокационных данных..."
 > geo_results.txt  # Инициализация файла
 while read -r line; do
     ip=$(echo "$line" | awk '{print $NF}')
-    echo "Запрашиваем геолокацию для IP: $ip..."
-    geo_info=$(curl -s ipinfo.io/$ip)
-    echo "Ответ от ipinfo.io: $geo_info"  # Выводим ответ для отладки
-    if [[ -n "$geo_info" ]]; then
-        city=$(echo "$geo_info" | jq -r '.city')
-        region=$(echo "$geo_info" | jq -r '.region')
-        country=$(echo "$geo_info" | jq -r '.country')
-        loc=$(echo "$geo_info" | jq -r '.loc')
-        if [[ -n "$city" && -n "$region" && -n "$country" && -n "$loc" ]]; then
-            echo "$line, $city, $region, $country, $loc" >> geo_results.txt
+    if [[ "$ip" != "None" ]]; then
+        echo "Запрашиваем геолокацию для IP: $ip..."
+        geo_info=$(curl -s ipinfo.io/$ip)
+        echo "Ответ от ipinfo.io: $geo_info"  # Выводим ответ для отладки
+        if [[ -n "$geo_info" ]]; then
+            city=$(echo "$geo_info" | jq -r '.city')
+            region=$(echo "$geo_info" | jq -r '.region')
+            country=$(echo "$geo_info" | jq -r '.country')
+            loc=$(echo "$geo_info" | jq -r '.loc')
+            if [[ -n "$city" && -n "$region" && -n "$country" && -n "$loc" ]]; then
+                echo "$line, $city, $region, $country, $loc" >> geo_results.txt
+            else
+                echo "$line, , , , " >> geo_results.txt
+            fi
         else
             echo "$line, , , , " >> geo_results.txt
         fi
