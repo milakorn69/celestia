@@ -110,15 +110,15 @@ done
 # Parse JSON and match validators with IP addresses
 echo "$validators" | jq -r '.validators[] | .description.moniker + " " + .operator_address' > validators.txt
 
-echo "Validator,IP" > result.txt
+echo "List of validators and their IP addresses:" > result.txt
 while read -r validator; do
     moniker=$(echo "$validator" | awk '{print $1}')
     address=$(echo "$validator" | awk '{print $2}')
     ip_list=$(grep "$moniker" peers.txt | awk '{print $2}' | sort | uniq | head -n 1)  # Get only the first IP
     if [[ -n "$ip_list" && "$ip_list" != "None" ]]; then
-        echo "$moniker,$ip_list" | tee -a result.txt
+        echo "Validator: $moniker; Address: $address; IP: $ip_list" | tee -a result.txt
     else
-        echo "$moniker,None" | tee -a result.txt
+        echo "Validator: $moniker; Address: $address; IP: None" | tee -a result.txt
     fi
 done < validators.txt
 
@@ -128,7 +128,7 @@ echo "Results saved to result.txt"
 echo "Fetching geolocation and hosting data..."
 > geo_results.txt  # Initialize file
 while read -r line; do
-    ip=$(echo "$line" | awk -F ',' '{print $2}')
+    ip=$(echo "$line" | awk -F 'IP: ' '{print $2}')
     if [[ "$ip" != "None" ]]; then
         echo "Querying geolocation for IP: $ip..."
         geo_info=$(curl -s ipinfo.io/$ip)
@@ -140,12 +140,12 @@ while read -r line; do
             org=$(echo "$geo_info" | jq -r '.org // "Unknown"')
             lat="${loc%%,*}"
             lng="${loc##*,}"
-            echo "$line,$city,$region,$country,$lat,$lng,$org" >> geo_results.txt
+            echo "$line; $city; $region; $country; $lat; $lng; $org" >> geo_results.txt
         else
-            echo "$line,Unknown,Unknown,Unknown,0.0,0.0,Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
+            echo "$line; Unknown; Unknown; Unknown; 0.0; 0.0; Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
         fi
     else
-        echo "$line,Unknown,Unknown,Unknown,0.0,0.0,Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
+        echo "$line; Unknown; Unknown; Unknown; 0.0; 0.0; Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
     fi
 done < result.txt
 
