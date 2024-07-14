@@ -111,9 +111,9 @@ while read -r line; do
             country=$(echo "$geo_info" | jq -r '.country')
             loc=$(echo "$geo_info" | jq -r '.loc')
             org=$(echo "$geo_info" | jq -r '.org')
-            if [[ -n "$city" && -n "$region" && -n "$country" && -n "$loc" && -n "$org" ]]; then
-                lat="${loc%%,*}"
-                lng="${loc##*,}"
+            lat="${loc%%,*}"
+            lng="${loc##*,}"
+            if [[ -n "$city" && -n "$region" && -n "$country" && -n "$lat" && -n "$lng" && -n "$org" ]]; then
                 echo "$line, $city, $region, $country, $lat, $lng, $org" >> geo_results.txt
             else
                 echo "$line, $city, $region, $country, , , Unknown" >> geo_results.txt
