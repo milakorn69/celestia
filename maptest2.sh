@@ -1,14 +1,18 @@
 #!/bin/bash
 
-# Проверка, установлен ли jq и curl
+# Check if jq and curl are installed
 if ! command -v jq &> /dev/null || ! command -v curl &> /dev/null; then
-    echo "jq или curl не установлены. Установите их и попробуйте снова."
+    echo "jq or curl is not installed. Please install them and try again."
     exit 1
 fi
 
-# Список IP-адресов узлов для опроса
+# List of node IPs for querying
 NODE_IPS=(
 "78.46.65.144"
+"72.46.84.33"
+"193.34.213.190"
+"195.3.221.146"
+"70.165.57.67"
 "65.21.227.52"
 "65.108.142.147"
 "https://celestia-testnet-rpc.itrocket.net/"
@@ -18,89 +22,89 @@ NODE_IPS=(
 "https://celestia.rpc.testnets.services-ernventures.com/"
 )
 
-# Порт для опроса
+# Port for querying
 PORTS=(
     "26657"
     "443"
 )
 
-# Получаем список валидаторов
-echo "Получаем список валидаторов..."
+# Get list of validators
+echo "Fetching list of validators..."
 validators=$(celestia-appd q staking validators --output json)
 
-# Проверка, удалось ли получить список валидаторов
+# Check if validators list was obtained
 if [[ -z "$validators" ]]; then
-    echo "Не удалось получить список валидаторов"
+    echo "Failed to get list of validators"
     exit 1
 fi
 
-echo "Список валидаторов получен. Данные валидаторов:"
+echo "Validators list obtained. Validator data:"
 echo "$validators" | jq .
 
-# Инициализация файла для пиров
+# Initialize peers file
 > peers.txt
 
-# Получаем информацию о пирах с нескольких узлов и портов
+# Get peer information from several nodes and ports
 for NODE_IP in "${NODE_IPS[@]}"; do
     for PORT in "${PORTS[@]}"; do
-        echo "Запрашиваем информацию у узла $NODE_IP на порту $PORT..."
+        echo "Querying node $NODE_IP on port $PORT..."
         response=$(curl -s --max-time 10 --connect-timeout 5 http://$NODE_IP:$PORT/net_info)
         
-        # Проверка статуса ответа
+        # Check response status
         if [[ $? -ne 0 ]]; then
-            echo "Не удалось получить ответ от узла $NODE_IP:$PORT в течение заданного времени."
+            echo "Failed to get response from node $NODE_IP:$PORT within the specified time."
             continue
         fi
         
-        # Проверка на пустой ответ
+        # Check for empty response
         if [[ -z "$response" ]]; then
-            echo "Пустой ответ от узла $NODE_IP:$PORT."
+            echo "Empty response from node $NODE_IP:$PORT."
             continue
         fi
 
-        # Выводим ответ для отладки
-        echo "Ответ от узла $NODE_IP:$PORT:"
+        # Output response for debugging
+        echo "Response from node $NODE_IP:$PORT:"
         echo "$response" | jq .
         
         if echo "$response" | jq empty &> /dev/null; then
             echo "$response" | jq -r '.result.peers[] | .node_info.moniker + " " + .remote_ip' >> peers.txt
-            break  # Выходим из внутреннего цикла после получения первого IP
+            break  # Exit inner loop after getting first IP
         else
-            echo "Нет данных от узла $NODE_IP:$PORT"
+            echo "No data from node $NODE_IP:$PORT"
         fi
     done
 done
 
-# Проверка содержимого файла peers.txt
-echo "Содержимое файла peers.txt:"
+# Check contents of peers.txt
+echo "Contents of peers.txt:"
 cat peers.txt
 
-# Парсинг JSON и сопоставление валидаторов и IP-адресов
+# Parse JSON and match validators with IP addresses
 echo "$validators" | jq -r '.validators[] | .description.moniker + " " + .operator_address' > validators.txt
 
-echo "Список валидаторов и их IP-адресов:" > result.txt
+echo "List of validators and their IP addresses:" > result.txt
 while read -r validator; do
     moniker=$(echo "$validator" | awk '{print $1}')
     address=$(echo "$validator" | awk '{print $2}')
-    ip_list=$(grep "$moniker" peers.txt | awk '{print $2}' | sort | uniq | head -n 1)  # Получаем только первый IP
+    ip_list=$(grep "$moniker" peers.txt | awk '{print $2}' | sort | uniq | head -n 1)  # Get only the first IP
     if [[ -n "$ip_list" ]]; then
-        echo "Валидатор: $moniker, Адрес: $address, IP: $ip_list" | tee -a result.txt
+        echo "Validator: $moniker, Address: $address, IP: $ip_list" | tee -a result.txt
     else
-        echo "Валидатор: $moniker, Адрес: $address, IP: None" | tee -a result.txt
+        echo "Validator: $moniker, Address: $address, IP: None" | tee -a result.txt
     fi
 done < validators.txt
 
-echo "Результаты сохранены в файл result.txt"
+echo "Results saved to result.txt"
 
-# Получение геолокационных данных для IP-адресов
-echo "Получение геолокационных данных..."
-> geo_results.txt  # Инициализация файла
+# Get geolocation data for IP addresses
+echo "Fetching geolocation data..."
+> geo_results.txt  # Initialize file
 while read -r line; do
     ip=$(echo "$line" | awk '{print $NF}')
     if [[ "$ip" != "None" ]]; then
-        echo "Запрашиваем геолокацию для IP: $ip..."
+        echo "Querying geolocation for IP: $ip..."
         geo_info=$(curl -s ipinfo.io/$ip)
-        echo "Ответ от ipinfo.io: $geo_info"  # Выводим ответ для отладки
+        echo "Response from ipinfo.io: $geo_info"  # Output response for debugging
         if [[ -n "$geo_info" ]]; then
             city=$(echo "$geo_info" | jq -r '.city')
             region=$(echo "$geo_info" | jq -r '.region')
@@ -119,7 +123,7 @@ while read -r line; do
     fi
 done < result.txt
 
-echo "Геолокационные данные сохранены в файл geo_results.txt"
+echo "Geolocation data saved to geo_results.txt"
 
-# Переход к Python скрипту для отображения на карте
+# Transition to Python script for map display
 python3 plot_map.py
