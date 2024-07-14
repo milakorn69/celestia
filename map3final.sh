@@ -112,15 +112,17 @@ while read -r line; do
             loc=$(echo "$geo_info" | jq -r '.loc')
             org=$(echo "$geo_info" | jq -r '.org')
             if [[ -n "$city" && -n "$region" && -n "$country" && -n "$loc" && -n "$org" ]]; then
-                echo "$line, $city, $region, $country, $loc, $org" >> geo_results.txt
+                lat="${loc%%,*}"
+                lng="${loc##*,}"
+                echo "$line, $city, $region, $country, $lat, $lng, $org" >> geo_results.txt
             else
-                echo "$line, $city, $region, $country, $loc, Unknown" >> geo_results.txt
+                echo "$line, $city, $region, $country, , , Unknown" >> geo_results.txt
             fi
         else
-            echo "$line, , , , , Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
+            echo "$line, , , , , , Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
         fi
     else
-        echo "$line, , , , , Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
+        echo "$line, , , , , , Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
     fi
 done < result.txt
 
