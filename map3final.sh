@@ -114,7 +114,7 @@ while read -r line; do
             if [[ -n "$city" && -n "$region" && -n "$country" && -n "$loc" && -n "$org" ]]; then
                 echo "$line, $city, $region, $country, $loc, $org" >> geo_results.txt
             else
-                echo "$line, , , , , " >> geo_results.txt
+                echo "$line, $city, $region, $country, $loc, Unknown" >> geo_results.txt
             fi
         else
             echo "$line, , , , , " >> geo_results.txt
