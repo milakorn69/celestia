@@ -69,7 +69,7 @@ while read -r validator; do
     moniker=$(echo "$validator" | awk '{print $1}')
     address=$(echo "$validator" | awk '{print $2}')
     ip_list=$(grep "$moniker" peers.txt | awk '{print $2}' | sort | uniq | head -n 1)  # Get only the first IP
-    if [[ -n "$ip_list" ]]; then
+    if [[ -n "$ip_list" && "$ip_list" != "None" ]]; then
         echo "Validator: $moniker, Address: $address, IP: $ip_list" | tee -a result.txt
     else
         echo "Validator: $moniker, Address: $address, IP: None" | tee -a result.txt
@@ -82,7 +82,7 @@ echo "Results saved to result.txt"
 echo "Fetching geolocation and hosting data..."
 > geo_results.txt  # Initialize file
 while read -r line; do
-    ip=$(echo "$line" | awk '{print $NF}')
+    ip=$(echo "$line" | awk -F 'IP: ' '{print $2}')
     if [[ "$ip" != "None" ]]; then
         echo "Querying geolocation for IP: $ip..."
         geo_info=$(curl -s ipinfo.io/$ip)
