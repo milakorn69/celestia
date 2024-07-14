@@ -117,10 +117,10 @@ while read -r line; do
                 echo "$line, $city, $region, $country, $loc, Unknown" >> geo_results.txt
             fi
         else
-            echo "$line, , , , , " >> geo_results.txt
+            echo "$line, , , , , Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
         fi
     else
-        echo "$line, , , , , " >> geo_results.txt
+        echo "$line, , , , , Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
     fi
 done < result.txt
 
