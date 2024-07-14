@@ -106,19 +106,13 @@ while read -r line; do
         geo_info=$(curl -s ipinfo.io/$ip)
         echo "Response from ipinfo.io: $geo_info"  # Output response for debugging
         if [[ -n "$geo_info" ]]; then
-            city=$(echo "$geo_info" | jq -r '.city')
-            region=$(echo "$geo_info" | jq -r '.region')
-            country=$(echo "$geo_info" | jq -r '.country')
-            loc=$(echo "$geo_info" | jq -r '.loc')
-            org=$(echo "$geo_info" | jq -r '.org')
+            city=$(echo "$geo_info" | jq -r '.city // "Unknown"')
+            region=$(echo "$geo_info" | jq -r '.region // "Unknown"')
+            country=$(echo "$geo_info" | jq -r '.country // "Unknown"')
+            loc=$(echo "$geo_info" | jq -r '.loc // "0.0,0.0"')
+            org=$(echo "$geo_info" | jq -r '.org // "Unknown"')
             lat="${loc%%,*}"
             lng="${loc##*,}"
-            city="${city:-Unknown}"
-            region="${region:-Unknown}"
-            country="${country:-Unknown}"
-            lat="${lat:-0.0}"
-            lng="${lng:-0.0}"
-            org="${org:-Unknown}"
             echo "$line, $city, $region, $country, $lat, $lng, $org" >> geo_results.txt
         else
             echo "$line, Unknown, Unknown, Unknown, 0.0, 0.0, Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
