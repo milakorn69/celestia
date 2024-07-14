@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Check if jq and curl are installed
+# Ensure necessary tools are installed
 if ! command -v jq &> /dev/null || ! command -v curl &> /dev/null; then
     echo "jq or curl is not installed. Please install them and try again."
     exit 1
@@ -28,7 +28,7 @@ PORTS=(
     "443"
 )
 
-# Get list of validators
+# Fetch list of validators
 echo "Fetching list of validators..."
 validators=$(celestia-appd q staking validators --output json)
 
@@ -38,46 +38,28 @@ if [[ -z "$validators" ]]; then
     exit 1
 fi
 
-echo "Validators list obtained. Validator data:"
-echo "$validators" | jq .
-
 # Initialize peers file
 > peers.txt
 
-# Get peer information from several nodes and ports
+# Get peer information from nodes
 for NODE_IP in "${NODE_IPS[@]}"; do
     for PORT in "${PORTS[@]}"; do
         echo "Querying node $NODE_IP on port $PORT..."
         response=$(curl -s --max-time 10 --connect-timeout 5 http://$NODE_IP:$PORT/net_info)
         
-        # Check response status
-        if [[ $? -ne 0 ]]; then
-            echo "Failed to get response from node $NODE_IP:$PORT within the specified time."
-            continue
-        fi
-        
-        # Check for empty response
-        if [[ -z "$response" ]]; then
-            echo "Empty response from node $NODE_IP:$PORT."
+        if [[ $? -ne 0 || -z "$response" ]]; then
+            echo "Failed to get response from node $NODE_IP:$PORT."
             continue
         fi
 
-        # Output response for debugging
-        echo "Response from node $NODE_IP:$PORT:"
-        echo "$response" | jq .
-        
         if echo "$response" | jq empty &> /dev/null; then
             echo "$response" | jq -r '.result.peers[] | .node_info.moniker + " " + .remote_ip' >> peers.txt
             break  # Exit inner loop after getting first IP
         else
-            echo "No data from node $NODE_IP:$PORT"
+            echo "No valid data from node $NODE_IP:$PORT"
         fi
     done
 done
-
-# Check contents of peers.txt
-echo "Contents of peers.txt:"
-cat peers.txt
 
 # Parse JSON and match validators with IP addresses
 echo "$validators" | jq -r '.validators[] | .description.moniker + " " + .operator_address' > validators.txt
@@ -104,7 +86,6 @@ while read -r line; do
     if [[ "$ip" != "None" ]]; then
         echo "Querying geolocation for IP: $ip..."
         geo_info=$(curl -s ipinfo.io/$ip)
-        echo "Response from ipinfo.io: $geo_info"  # Output response for debugging
         if [[ -n "$geo_info" ]]; then
             city=$(echo "$geo_info" | jq -r '.city // "Unknown"')
             region=$(echo "$geo_info" | jq -r '.region // "Unknown"')
