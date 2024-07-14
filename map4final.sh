@@ -99,7 +99,7 @@ for NODE_IP in "${NODE_IPS[@]}"; do
         fi
 
         if echo "$response" | jq empty &> /dev/null; then
-            echo "$response" | jq -r '.result.peers[] | .node_info.moniker + " " + .remote_ip' >> peers.txt
+            echo "$response" | jq -r '.result.peers[] | .node_info.moniker + ";" + .remote_ip' >> peers.txt
             break  # Exit inner loop after getting first IP
         else
             echo "No valid data from node $NODE_IP:$PORT"
@@ -108,13 +108,13 @@ for NODE_IP in "${NODE_IPS[@]}"; do
 done
 
 # Parse JSON and match validators with IP addresses
-echo "$validators" | jq -r '.validators[] | .description.moniker + " " + .operator_address' > validators.txt
+echo "$validators" | jq -r '.validators[] | .description.moniker + ";" + .operator_address' > validators.txt
 
 echo "List of validators and their IP addresses:" > result.txt
 while read -r validator; do
-    moniker=$(echo "$validator" | awk '{print $1}')
-    address=$(echo "$validator" | awk '{print $2}')
-    ip_list=$(grep "$moniker" peers.txt | awk '{print $2}' | sort | uniq | head -n 1)  # Get only the first IP
+    moniker=$(echo "$validator" | awk -F';' '{print $1}')
+    address=$(echo "$validator" | awk -F';' '{print $2}')
+    ip_list=$(grep "$moniker" peers.txt | awk -F';' '{print $2}' | sort | uniq | head -n 1)  # Get only the first IP
     if [[ -n "$ip_list" && "$ip_list" != "None" ]]; then
         echo "Validator: $moniker; Address: $address; IP: $ip_list" | tee -a result.txt
     else
