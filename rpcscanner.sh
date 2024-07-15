@@ -16,7 +16,7 @@ check_rpc() {
   local ip=$1
   local port=$2
   echo "Проверка $ip:$port" | tee -a $LOG_FILE  # Логирование процесса проверки
-  if nc -z -w 10 $ip $port 2>>$LOG_FILE; then
+  if nc -zv -w 10 $ip $port 2>&1 | tee -a $LOG_FILE | grep -q "succeeded"; then
     echo "Доступен: $ip:$port" | tee -a $LOG_FILE
     echo "http://$ip:$port/" >> $OUTPUT_FILE
   else
