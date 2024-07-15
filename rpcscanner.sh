@@ -89,15 +89,19 @@ check_rpc() {
     if nc -zv -w 2 $ip $port 2>&1 | tee -a $LOG_FILE | grep -q "succeeded"; then
         echo "Доступен: $ip:$port" | tee -a $LOG_FILE
         echo "http://$ip:$port/" >> $OUTPUT_FILE
+        return 0  # Успешное подключение, вернем 0
     else
         echo "Недоступен или превышен тайм-аут: $ip:$port" | tee -a $LOG_FILE
+        return 1  # Не удалось подключиться, вернем 1
     fi
 }
 
 # Check each IP on each port
 for ip in "${NODE_IPS[@]}"; do
     for port in "${PORTS[@]}"; do
-        check_rpc $ip $port
+        if check_rpc $ip $port; then
+            break  # Если удалось подключиться, выходим из внутреннего цикла для этого IP
+        fi
     done
 done
 
