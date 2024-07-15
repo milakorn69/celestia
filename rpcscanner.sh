@@ -8,13 +8,13 @@ fi
 
 # List of node IPs for querying
 NODE_IPS=(
-"https://celestia-testnet-rpc.itrocket.net/"
-"https://celestia-testnet.rpc.kjnodes.com/"
-"https://celestia-testnet-rpc.stake-town.com/"
-"https://celestia.test.rpc.nodeshub.online/"
-"https://celestia.rpc.testnets.services-ernventures.com/"
-"https://celestia-rpc.0xcryptovestor.com"
-"https://rpc.celestia.nodestake.top"
+"http://celestia-testnet-rpc.itrocket.net/"
+"http://celestia-testnet.rpc.kjnodes.com/"
+"http://celestia-testnet-rpc.stake-town.com/"
+"http://celestia.test.rpc.nodeshub.online/"
+"http://celestia.rpc.testnets.services-ernventures.com/"
+"http://celestia-rpc.0xcryptovestor.com"
+"http://rpc.celestia.nodestake.top"
 )
 
 # Port for querying
