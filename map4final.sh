@@ -87,22 +87,37 @@ fi
 # Initialize peers file
 > peers.txt
 
+# Function to check availability of a port on a given IP
+check_rpc() {
+    local ip=$1
+    local port=$2
+    echo "Проверка $ip:$port"  # Log the process of checking
+    if curl -s --max-time 2 --connect-timeout 2 "http://$ip:$port/net_info" 2>&1 | grep -q "result"; then
+        echo "Доступен: $ip:$port"
+        return 0  # Успешное подключение, вернем 0
+    else
+        echo "Недоступен или превышен тайм-аут: $ip:$port"
+        return 1  # Не удалось подключиться, вернем 1
+    fi
+}
+
 # Get peer information from nodes
 for NODE_IP in "${NODE_IPS[@]}"; do
     for PORT in "${PORTS[@]}"; do
         echo "Querying node $NODE_IP on port $PORT..."
-        response=$(curl -s --max-time 10 --connect-timeout 5 http://$NODE_IP:$PORT/net_info)
-        
-        if [[ $? -ne 0 || -z "$response" ]]; then
-            echo "Failed to get response from node $NODE_IP:$PORT."
-            continue
-        fi
+        if check_rpc $NODE_IP $PORT; then
+            response=$(curl -s "http://$NODE_IP:$PORT/net_info")
+            if [[ $? -ne 0 || -z "$response" ]]; then
+                echo "Failed to get response from node $NODE_IP:$PORT."
+                continue
+            fi
 
-        if echo "$response" | jq empty &> /dev/null; then
-            echo "$response" | jq -r '.result.peers[] | .node_info.moniker + ";" + .remote_ip' >> peers.txt
-            break  # Exit inner loop after getting first IP
-        else
-            echo "No valid data from node $NODE_IP:$PORT"
+            if echo "$response" | jq empty &> /dev/null; then
+                echo "$response" | jq -r '.result.peers[] | .node_info.moniker + ";" + .remote_ip' >> peers.txt
+                break  # Exit inner loop after getting first IP
+            else
+                echo "No valid data from node $NODE_IP:$PORT"
+            fi
         fi
     done
 done
