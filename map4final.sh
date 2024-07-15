@@ -58,7 +58,7 @@ NODE_IPS=(
 "https://rpc.celestia.nodestake.top"
 )
 
-# Port for querying
+# Ports for querying
 PORTS=(
 "26667"
 "26657"
