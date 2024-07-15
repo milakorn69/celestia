@@ -2,7 +2,7 @@
 
 # Ensure necessary tools are installed
 if ! command -v jq &> /dev/null || ! command -v curl &> /dev/null || ! command -v nc &> /dev/null; then
-    echo "jq, curl or nc (netcat) is not installed. Please install them and try again."
+    echo "jq, curl, or nc (netcat) is not installed. Please install them and try again."
     exit 1
 fi
 
@@ -86,7 +86,7 @@ check_rpc() {
     local ip=$1
     local port=$2
     echo "Проверка $ip:$port" | tee -a $LOG_FILE  # Log the process of checking
-    if nc -zv -w 10 $ip $port 2>&1 | tee -a $LOG_FILE | grep -q "succeeded"; then
+    if nc -zv -w 2 $ip $port 2>&1 | tee -a $LOG_FILE | grep -q "succeeded"; then
         echo "Доступен: $ip:$port" | tee -a $LOG_FILE
         echo "http://$ip:$port/" >> $OUTPUT_FILE
     else
