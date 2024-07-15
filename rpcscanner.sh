@@ -11,16 +11,16 @@ LOG_FILE="rpc_check.log"
 > $OUTPUT_FILE
 > $LOG_FILE
 
-# Функция для проверки доступности RPC на заданном порту
+# Функция для проверки доступности порта на заданном IP
 check_rpc() {
   local ip=$1
   local port=$2
-  echo "Проверка http://$ip:$port/" | tee -a $LOG_FILE  # Логирование процесса проверки
+  echo "Проверка $ip:$port" | tee -a $LOG_FILE  # Логирование процесса проверки
   if nc -z -w 10 $ip $port 2>>$LOG_FILE; then
-    echo "Доступен: http://$ip:$port/" | tee -a $LOG_FILE
+    echo "Доступен: $ip:$port" | tee -a $LOG_FILE
     echo "http://$ip:$port/" >> $OUTPUT_FILE
   else
-    echo "Недоступен или превышен тайм-аут: http://$ip:$port/" | tee -a $LOG_FILE
+    echo "Недоступен или превышен тайм-аут: $ip:$port" | tee -a $LOG_FILE
   fi
 }
 
