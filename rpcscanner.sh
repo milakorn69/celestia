@@ -16,7 +16,7 @@ check_rpc() {
   local ip=$1
   local port=$2
   echo "Проверка http://$ip:$port/" | tee -a $LOG_FILE  # Логирование процесса проверки
-  if curl -s --head --max-time 10 "http://$ip:$port/status" 2>>$LOG_FILE | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null; then
+  if nc -z -w 10 $ip $port 2>>$LOG_FILE; then
     echo "Доступен: http://$ip:$port/" | tee -a $LOG_FILE
     echo "http://$ip:$port/" >> $OUTPUT_FILE
   else
@@ -27,6 +27,7 @@ check_rpc() {
 # Выполняем запрос к локальному RPC серверу и извлекаем адреса узлов
 echo "Получение списка узлов..." | tee -a $LOG_FILE
 PEER_IPS=$(curl -s http://localhost:26657/net_info | jq -r '.result.peers[].remote_ip' 2>>$LOG_FILE)
+echo "Список узлов получен: $PEER_IPS" | tee -a $LOG_FILE
 
 # Проверяем каждый IP на каждом из возможных портов
 for ip in $PEER_IPS; do
