@@ -5,26 +5,28 @@ RPC_PORTS=(26657 26658 26659 26660 26667 21657 27657 35657 43657 26698 34657 266
 
 # Файл для записи результатов
 OUTPUT_FILE="rpc_endpoints.txt"
+LOG_FILE="rpc_check.log"
 
-# Очищаем файл перед записью
+# Очищаем файлы перед записью
 > $OUTPUT_FILE
+> $LOG_FILE
 
 # Функция для проверки доступности RPC на заданном порту
 check_rpc() {
   local ip=$1
   local port=$2
-  echo "Проверка http://$ip:$port/"  # Логирование процесса проверки
-  if curl -s --head --max-time 10 "http://$ip:$port/status" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null; then
-    echo "Доступен: http://$ip:$port/"
+  echo "Проверка http://$ip:$port/" | tee -a $LOG_FILE  # Логирование процесса проверки
+  if curl -s --head --max-time 10 "http://$ip:$port/status" 2>>$LOG_FILE | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null; then
+    echo "Доступен: http://$ip:$port/" | tee -a $LOG_FILE
     echo "http://$ip:$port/" >> $OUTPUT_FILE
   else
-    echo "Недоступен или превышен тайм-аут: http://$ip:$port/"
+    echo "Недоступен или превышен тайм-аут: http://$ip:$port/" | tee -a $LOG_FILE
   fi
 }
 
 # Выполняем запрос к локальному RPC серверу и извлекаем адреса узлов
-echo "Получение списка узлов..."
-PEER_IPS=$(curl -s http://localhost:26657/net_info | jq -r '.result.peers[].remote_ip')
+echo "Получение списка узлов..." | tee -a $LOG_FILE
+PEER_IPS=$(curl -s http://localhost:26657/net_info | jq -r '.result.peers[].remote_ip' 2>>$LOG_FILE)
 
 # Проверяем каждый IP на каждом из возможных портов
 for ip in $PEER_IPS; do
@@ -34,5 +36,5 @@ for ip in $PEER_IPS; do
 done
 
 # Проверяем содержимое файла
-echo "Список доступных RPC точек записан в файл $OUTPUT_FILE:"
-cat $OUTPUT_FILE
+echo "Список доступных RPC точек записан в файл $OUTPUT_FILE:" | tee -a $LOG_FILE
+cat $OUTPUT_FILE | tee -a $LOG_FILE
