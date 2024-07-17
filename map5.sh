@@ -126,35 +126,32 @@ done
 echo "$validators" | jq -r '.validators[] | .description.moniker + ";" + .operator_address' > validators.txt
 
 echo "List of validators and their IP addresses:" > result.txt
-> all_ips.txt  # Initialize the all_ips.txt file
+> all_ips.txt
 while read -r validator; do
     moniker=$(echo "$validator" | awk -F';' '{print $1}')
     address=$(echo "$validator" | awk -F';' '{print $2}')
     ip_list=$(grep "$moniker" peers.txt | awk -F';' '{print $2}' | sort | uniq | head -n 1)  # Get only the first IP
     if [[ -n "$ip_list" && "$ip_list" != "None" ]]; then
         echo "$moniker;$address;$ip_list" | tee -a result.txt
-        echo "$moniker;$address;$ip_list" >> all_ips.txt  # Save moniker, address, and IP to all_ips.txt
+        echo "$moniker;$ip_list" >> all_ips.txt
     else
         echo "$moniker;$address;None" | tee -a result.txt
     fi
 done < validators.txt
 
 echo "Results saved to result.txt"
-echo "All IP addresses saved to all_ips.txt"
+echo "All IPs saved to all_ips.txt"
 
-# Initialize geo_results.txt file
-> geo_results.txt
-
-# Fetch geolocation and hosting data for each IP address
+# Get geolocation and hosting data for IP addresses
 echo "Fetching geolocation and hosting data..."
+> geo_results.txt  # Initialize file
 while read -r line; do
-    ip=$(echo "$line" | awk -F';' '{print $3}')
+    moniker=$(echo "$line" | awk -F';' '{print $1}')
+    ip=$(echo "$line" | awk -F';' '{print $2}')
     if [[ "$ip" != "None" ]]; then
         echo "Querying geolocation for IP: $ip..."
         geo_info=$(curl -s ipinfo.io/$ip)
         if [[ -n "$geo_info" ]]; then
-            moniker=$(echo "$line" | awk -F';' '{print $1}')
-            address=$(echo "$line" | awk -F';' '{print $2}')
             city=$(echo "$geo_info" | jq -r '.city // "Unknown"')
             region=$(echo "$geo_info" | jq -r '.region // "Unknown"')
             country=$(echo "$geo_info" | jq -r '.country // "Unknown"')
@@ -162,13 +159,16 @@ while read -r line; do
             org=$(echo "$geo_info" | jq -r '.org // "Unknown"')
             lat="${loc%%,*}"
             lng="${loc##*,}"
-            echo "$moniker;$address;$ip;$city;$region;$country;$lat;$lng;$org" >> geo_results.txt
+            echo "$moniker;$ip;$city;$region;$country;$lat;$lng;$org" >> geo_results.txt
         else
-            echo "$line;Unknown;Unknown;Unknown;0.0;0.0;Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
+            echo "$moniker;$ip;Unknown;Unknown;Unknown;0.0;0.0;Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
         fi
     else
-        echo "$line;Unknown;Unknown;Unknown;0.0;0.0;Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
+        echo "$moniker;$ip;Unknown;Unknown;Unknown;0.0;0.0;Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
     fi
 done < all_ips.txt
 
 echo "Geolocation and hosting data saved to geo_results.txt"
+
+# Transition to Python script for map display
+python3 plot_map.py
