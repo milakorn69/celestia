@@ -114,7 +114,6 @@ for NODE_IP in "${NODE_IPS[@]}"; do
 
             if echo "$response" | jq empty &> /dev/null; then
                 echo "$response" | jq -r '.result.peers[] | .node_info.moniker + ";" + .remote_ip' >> peers.txt
-                break  # Exit inner loop after getting first IP
             else
                 echo "No valid data from node $NODE_IP:$PORT"
             fi
