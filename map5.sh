@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Ensure necessary tools are installed
+# Убедитесь, что необходимые инструменты установлены
 if ! command -v jq &> /dev/null || ! command -v curl &> /dev/null; then
-    echo "jq or curl is not installed. Please install them and try again."
+    echo "jq или curl не установлены. Пожалуйста, установите их и повторите попытку."
     exit 1
 fi
 
-# List of node IPs for querying
+# Список IP-адресов узлов для запросов
 NODE_IPS=(
 "104.219.237.146"
 "37.27.109.215"
@@ -58,7 +58,7 @@ NODE_IPS=(
 "https://rpc.celestia.nodestake.top"
 )
 
-# Ports for querying
+# Порты для запросов
 PORTS=(
 "26667"
 "26657"
@@ -74,63 +74,63 @@ PORTS=(
 "443"
 )
 
-# Fetch list of validators
-echo "Fetching list of validators..."
+# Получение списка валидаторов
+echo "Получение списка валидаторов..."
 validators=$(celestia-appd q staking validators --output json)
 
-# Check if validators list was obtained
+# Проверка, удалось ли получить список валидаторов
 if [[ -z "$validators" ]]; then
-    echo "Failed to get list of validators"
+    echo "Не удалось получить список валидаторов"
     exit 1
 fi
 
-# Initialize peers file
+# Инициализация файла с пирами
 > peers.txt
 
-# Function to check availability of a port on a given IP
+# Функция для проверки доступности порта на данном IP
 check_rpc() {
     local ip=$1
     local port=$2
-    echo "Checking $ip:$port"  # Log the process of checking
+    echo "Проверка $ip:$port"  # Лог процесса проверки
     if curl -s --max-time 2 --connect-timeout 2 "http://$ip:$port/net_info" 2>&1 | grep -q "result"; then
-        echo "Available: $ip:$port"
-        return 0  # Successful connection, return 0
+        echo "Доступен: $ip:$port"
+        return 0  # Успешное подключение, возвращаем 0
     else
-        echo "Unavailable or timeout: $ip:$port"
-        return 1  # Failed to connect, return 1
+        echo "Недоступен или превышен тайм-аут: $ip:$port"
+        return 1  # Не удалось подключиться, возвращаем 1
     fi
 }
 
-# Get peer information from nodes
+# Получение информации о пирах с узлов
 for NODE_IP in "${NODE_IPS[@]}"; do
     for PORT in "${PORTS[@]}"; do
-        echo "Querying node $NODE_IP on port $PORT..."
+        echo "Запрос узла $NODE_IP на порту $PORT..."
         if check_rpc $NODE_IP $PORT; then
             response=$(curl -s "http://$NODE_IP:$PORT/net_info")
             if [[ $? -ne 0 || -z "$response" ]]; then
-                echo "Failed to get response from node $NODE_IP:$PORT."
+                echo "Не удалось получить ответ от узла $NODE_IP:$PORT."
                 continue
             fi
 
             if echo "$response" | jq empty &> /dev/null; then
                 echo "$response" | jq -r '.result.peers[] | .node_info.moniker + ";" + .remote_ip' >> peers.txt
-                break  # Exit inner loop after getting first IP
+                break  # Выходим из внутреннего цикла после получения первого IP
             else
-                echo "No valid data from node $NODE_IP:$PORT"
+                echo "Нет действительных данных от узла $NODE_IP:$PORT"
             fi
         fi
     done
 done
 
-# Parse JSON and match validators with IP addresses
+# Разбор JSON и сопоставление валидаторов с IP-адресами
 echo "$validators" | jq -r '.validators[] | .description.moniker + ";" + .operator_address' > validators.txt
 
-echo "List of validators and their IP addresses:" > result.txt
+echo "Список валидаторов и их IP-адреса:" > result.txt
 > all_ips.txt
 while read -r validator; do
     moniker=$(echo "$validator" | awk -F';' '{print $1}')
     address=$(echo "$validator" | awk -F';' '{print $2}')
-    ip_list=$(grep "$moniker" peers.txt | awk -F';' '{print $2}' | sort | uniq | head -n 1)  # Get only the first IP
+    ip_list=$(grep "$moniker" peers.txt | awk -F';' '{print $2}' | sort | uniq | head -n 1)  # Получаем только первый IP
     if [[ -n "$ip_list" && "$ip_list" != "None" ]]; then
         echo "$moniker;$address;$ip_list" | tee -a result.txt
         echo "$moniker;$ip_list" >> all_ips.txt
@@ -139,17 +139,17 @@ while read -r validator; do
     fi
 done < validators.txt
 
-echo "Results saved to result.txt"
-echo "All IPs saved to all_ips.txt"
+echo "Результаты сохранены в result.txt"
+echo "Все IP сохранены в all_ips.txt"
 
-# Get geolocation and hosting data for IP addresses
-echo "Fetching geolocation and hosting data..."
-> geo_results.txt  # Initialize file
+# Получение данных о геолокации и хостинге для IP-адресов
+echo "Получение данных о геолокации и хостинге..."
+> geo_results.txt  # Инициализация файла
 while read -r line; do
     moniker=$(echo "$line" | awk -F';' '{print $1}')
     ip=$(echo "$line" | awk -F';' '{print $2}')
     if [[ "$ip" != "None" ]]; then
-        echo "Querying geolocation for IP: $ip..."
+        echo "Запрос геолокации для IP: $ip..."
         geo_info=$(curl -s ipinfo.io/$ip)
         if [[ -n "$geo_info" ]]; then
             city=$(echo "$geo_info" | jq -r '.city // "Unknown"')
@@ -161,14 +161,52 @@ while read -r line; do
             lng="${loc##*,}"
             echo "$moniker;$ip;$city;$region;$country;$lat;$lng;$org" >> geo_results.txt
         else
-            echo "$moniker;$ip;Unknown;Unknown;Unknown;0.0;0.0;Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
+            echo "$moniker;$ip;Unknown;Unknown;Unknown;0.0;0.0;Unknown" >> geo_results.txt  # Убеждаемся, что каждая строка имеет правильное количество полей
         fi
     else
-        echo "$moniker;$ip;Unknown;Unknown;Unknown;0.0;0.0;Unknown" >> geo_results.txt  # Ensure every line has the right number of fields
+        echo "$moniker;$ip;Unknown;Unknown;Unknown;0.0;0.0;Unknown" >> geo_results.txt  # Убеждаемся, что каждая строка имеет правильное количество полей
     fi
 done < all_ips.txt
 
-echo "Geolocation and hosting data saved to geo_results.txt"
+echo "Данные о геолокации и хостинге сохранены в geo_results.txt"
 
-# Transition to Python script for map display
-python3 plot_map.py
+# Создание Python скрипта plot_map.py
+echo 'import requests
+import pandas as pd
+from geopy.geocoders import Nominatim
+import folium
+from folium.plugins import MarkerCluster
+
+def get_geo_info(ip):
+    try:
+        response = requests.get(f"http://ipinfo.io/{ip}/json")
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None
+    except Exception as e:
+        print(f"Error fetching data from ipinfo.io: {e}")
+        return None
+
+def get_coordinates_via_geopy(city, country):
+    geolocator = Nominatim(user_agent="geoapiExercises")
+    try:
+        location = geolocator.geocode(f"{city}, {country}")
+        if location:
+            return location.latitude, location.longitude
+        else:
+            return None, None
+    except Exception as e:
+        print(f"Error fetching coordinates via geopy: {e}")
+        return None, None
+
+# Чтение файла geo_results.txt
+with open("geo_results.txt", "r") as file:
+    lines = file.readlines()
+
+output_data = []
+
+for line in lines:
+    parts = line.strip().split(";")
+    if len(parts) == 8:
+        validator, ip, city, region, country, lat, lng,
