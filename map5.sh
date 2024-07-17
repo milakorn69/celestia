@@ -91,13 +91,13 @@ fi
 check_rpc() {
     local ip=$1
     local port=$2
-    echo "Проверка $ip:$port"  # Log the process of checking
+    echo "Checking $ip:$port"  # Log the process of checking
     if curl -s --max-time 2 --connect-timeout 2 "http://$ip:$port/net_info" 2>&1 | grep -q "result"; then
-        echo "Доступен: $ip:$port"
-        return 0  # Успешное подключение, вернем 0
+        echo "Available: $ip:$port"
+        return 0  # Successful connection, return 0
     else
-        echo "Недоступен или превышен тайм-аут: $ip:$port"
-        return 1  # Не удалось подключиться, вернем 1
+        echo "Unavailable or timeout: $ip:$port"
+        return 1  # Failed to connect, return 1
     fi
 }
 
