@@ -171,4 +171,4 @@ done < all_ips.txt
 echo "Geolocation and hosting data saved to geo_results.txt"
 
 # Transition to Python script for map display
-python3 refine_geo_and_plot_map.py
+python3 create_mapbox_gl_map.py
