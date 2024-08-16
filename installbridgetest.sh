@@ -39,6 +39,7 @@ ExecStart=$(which celestia) bridge start \
   --metrics.tls=true \
   --metrics \
   --metrics.endpoint otel.celestia-mocha.com
+  --keyring.keyname bridge_wallet
 Restart=on-failure
 RestartSec=3
 LimitNOFILE=65535
