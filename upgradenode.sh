@@ -3,7 +3,7 @@ sudo systemctl stop celestia-bridge
 rm -rf celestia-node
 git clone https://github.com/celestiaorg/celestia-node.git
 cd celestia-node/
-git checkout tags/v0.16.0-rc0
+git checkout tags/v0.16.0
 make build 
 sudo make install 
 make cel-key 
