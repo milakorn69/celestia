@@ -1,25 +1,29 @@
 #!/bin/bash
-# Обновление и установка необходимых пакетов
+
+# Обновление системы и установка необходимых пакетов
 sudo apt update && sudo apt upgrade -y
-sudo apt install curl git wget htop tmux build-essential jq make gcc -y
+sudo apt install curl git wget htop tmux build-essential jq make gcc lz4 -y
 
 # Переменные окружения для Celestia
 CELESTIA_PORT=26
-echo "export WALLET='ERN'" >> $HOME/.bash_profile
-echo "export MONIKER='ERN'" >> $HOME/.bash_profile
-echo "export CHAIN_ID='mocha-4'" >> $HOME/.bash_profile
+WALLET='ERN'
+MONIKER='ERN'
+CHAIN_ID='mocha-4'
+
+echo "export WALLET='${WALLET}'" >> $HOME/.bash_profile
+echo "export MONIKER='${MONIKER}'" >> $HOME/.bash_profile
+echo "export CHAIN_ID='${CHAIN_ID}'" >> $HOME/.bash_profile
 echo "export CELESTIA_PORT='${CELESTIA_PORT}'" >> $HOME/.bash_profile
 source $HOME/.bash_profile
 
-# Установка Go, если не установлен
+# Установка последней версии Go
 if ! [ -x "$(command -v go)" ]; then
-    VER="1.22.0"
-    wget "https://golang.org/dl/go$VER.linux-amd64.tar.gz"
+    GO_VERSION="1.21.1"
+    wget "https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz"
     sudo rm -rf /usr/local/go
-    sudo tar -C /usr/local -xzf "go$VER.linux-amd64.tar.gz"
-    rm "go$VER.linux-amd64.tar.gz"
-    [ ! -f ~/.bash_profile ] && touch ~/.bash_profile
-    echo "export PATH=$PATH:/usr/local/go/bin:~/go/bin" >> ~/.bash_profile
+    sudo tar -C /usr/local -xzf "go$GO_VERSION.linux-amd64.tar.gz"
+    rm "go$GO_VERSION.linux-amd64.tar.gz"
+    echo "export PATH=\$PATH:/usr/local/go/bin:~/go/bin" >> ~/.bash_profile
     source ~/.bash_profile
 fi
 
@@ -37,14 +41,14 @@ git checkout tags/$APP_VERSION -b $APP_VERSION
 # Исправление модуля cmp в go.mod
 go mod edit -replace cmp=github.com/google/go-cmp@v0.5.8
 
-# Очистка и обновление зависимостей
+# Очистка зависимостей и обновление go.mod
 go mod tidy
 
 # Сборка и установка Celestia
 make build
 make install
 
-# Настройка сети Celestia
+# Настройка Celestia
 cd $HOME
 rm -rf networks
 git clone https://github.com/celestiaorg/networks.git
@@ -55,7 +59,7 @@ celestia-appd config keyring-backend os
 celestia-appd config chain-id $CHAIN_ID
 celestia-appd init $MONIKER --chain-id $CHAIN_ID
 
-# Загрузка genesis и addrbook файлов
+# Загрузка genesis и addrbook
 wget -O $HOME/.celestia-app/config/genesis.json https://testnets.services-ernventures.com/celestia/genesis.json
 wget -O $HOME/.celestia-app/config/addrbook.json https://testnets.services-ernventures.com/celestia/addrbook.json
 
@@ -64,7 +68,7 @@ SEEDS="5d0bf034d6e6a8b5ee31a2f42f753f1107b3a00e@celestia-testnet-seed.itrocket.n
 PEERS="77f8a816610d521cecb4c62f834891e1a6257b09@65.108.207.143:26656"
 sed -i -e 's|^seeds *=.*|seeds = "'$SEEDS'"|; s|^persistent_peers *=.*|persistent_peers = "'$PEERS'"|' $HOME/.celestia-app/config/config.toml
 
-# Обновление портов в конфигурационных файлах
+# Настройка портов в конфигурации
 sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${CELESTIA_PORT}317\"%;
 s%^address = \":8080\"%address = \":${CELESTIA_PORT}080\"%;
 s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:${CELESTIA_PORT}090\"%; 
@@ -115,7 +119,6 @@ EOF
 
 # Установка снапшота
 cd $HOME
-sudo apt install lz4 -y
 rm -rf ~/.celestia-app/data
 mkdir -p ~/.celestia-app/data
 wget -O snap_celestia.tar.lz4 https://testnets.services-ernventures.com/celestia/snap_celestia-prun.tar.lz4
