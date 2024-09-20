@@ -1,18 +1,18 @@
 #!/bin/bash
 sudo apt update && sudo apt upgrade -y
-sudo apt install curl git wget htop tmux build-essential jq make gcc -y
+sudo apt install curl git wget htop tmux build-essential jq make gcc lz4 -y
 
 CELESTIA_PORT=26
-echo "export WALLET="ERN" >> $HOME/.bash_profile
-echo "export MONIKER="ERN" >> $HOME/.bash_profile
-echo "export CHAIN_ID="mocha-4"" >> $HOME/.bash_profile
-echo "export CELESTIA_PORT="${CELESTIA_PORT}"" >> $HOME/.bash_profile
+echo "export WALLET='ERN'" >> $HOME/.bash_profile
+echo "export MONIKER='ERN'" >> $HOME/.bash_profile
+echo "export CHAIN_ID='mocha-4'" >> $HOME/.bash_profile
+echo "export CELESTIA_PORT='${CELESTIA_PORT}'" >> $HOME/.bash_profile
 source $HOME/.bash_profile
 
+# Установка последней версии Go
 cd ~
 rm -rf $HOME/go
 sudo rm -rf /usr/local/go
-cd $HOME
 curl https://dl.google.com/go/go1.22.5.linux-amd64.tar.gz | sudo tar -C/usr/local -zxvf -
 cat <<'EOF' >>$HOME/.profile
 export GOROOT=/usr/local/go
@@ -23,6 +23,7 @@ EOF
 source $HOME/.profile
 go version
 
+# Скачивание и установка Celestia
 cd $HOME 
 rm -rf celestia-app 
 git clone https://github.com/celestiaorg/celestia-app.git 
@@ -32,24 +33,27 @@ git checkout tags/$APP_VERSION -b $APP_VERSION
 make build
 make install
 
-
+# Скачивание сетевых файлов
 cd $HOME
 rm -rf networks
 git clone https://github.com/celestiaorg/networks.git
 
+# Конфигурация Celestia
 celestia-appd config node tcp://localhost:${CELESTIA_PORT}657
 celestia-appd config keyring-backend os
 celestia-appd config chain-id $CHAIN_ID
 celestia-appd init ERN --chain-id mocha-4
 
+# Загрузка genesis и addrbook
 wget -O $HOME/.celestia-app/config/genesis.json https://testnets.services-ernventures.com/celestia/genesis.json
 wget -O $HOME/.celestia-app/config/addrbook.json https://testnets.services-ernventures.com/celestia/addrbook.json
 
+# Настройка SEEDS и PEERS
 SEEDS="5d0bf034d6e6a8b5ee31a2f42f753f1107b3a00e@celestia-testnet-seed.itrocket.net:11656"
 PEERS="77f8a816610d521cecb4c62f834891e1a6257b09@65.108.207.143:26656"
 sed -i -e 's|^seeds *=.*|seeds = "'$SEEDS'"|; s|^persistent_peers *=.*|persistent_peers = "'$PEERS'"|' $HOME/.celestia-app/config/config.toml
 
-
+# Настройка портов
 sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${CELESTIA_PORT}317\"%;
 s%^address = \":8080\"%address = \":${CELESTIA_PORT}080\"%;
 s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:${CELESTIA_PORT}090\"%; 
@@ -57,6 +61,7 @@ s%^address = \"0.0.0.0:9091\"%address = \"0.0.0.0:${CELESTIA_PORT}091\"%;
 s%^address = \"0.0.0.0:8545\"%address = \"0.0.0.0:${CELESTIA_PORT}545\"%; 
 s%^ws-address = \"0.0.0.0:8546\"%ws-address = \"0.0.0.0:${CELESTIA_PORT}546\"%" $HOME/.celestia-app/config/app.toml
 
+# Настройки узла (прокси, метрики и внешний адрес)
 sed -i.bak -e "s%^proxy_app = \"tcp://127.0.0.1:26658\"%proxy_app = \"tcp://127.0.0.1:${CELESTIA_PORT}658\"%; 
 s%^laddr = \"tcp://127.0.0.1:26657\"%laddr = \"tcp://0.0.0.0:${CELESTIA_PORT}657\"%; 
 s%^pprof_laddr = \"localhost:6060\"%pprof_laddr = \"localhost:${CELESTIA_PORT}060\"%;
@@ -64,22 +69,24 @@ s%^laddr = \"tcp://0.0.0.0:26656\"%laddr = \"tcp://0.0.0.0:${CELESTIA_PORT}656\"
 s%^external_address = \"\"%external_address = \"$(wget -qO- eth0.me):${CELESTIA_PORT}656\"%;
 s%^prometheus_listen_addr = \":26660\"%prometheus_listen_addr = \":${CELESTIA_PORT}660\"%" $HOME/.celestia-app/config/config.toml
 
-pruning="nothing"
-pruning_keep_recent="1000"
-pruning_interval="10"
-sed -i -e "s/^pruning *=.*/pruning = \"$pruning\"/" $HOME/.celestia-app/config/app.toml && \
-sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"$pruning_keep_recent\"/" $HOME/.celestia-app/config/app.toml && \
-sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"$pruning_interval\"/" $HOME/.celestia-app/config/app.toml
+# Настройки прунинга для архивного узла
+sed -i -e "s/^pruning *=.*/pruning = \"nothing\"/" $HOME/.celestia-app/config/app.toml
+sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"0\"/" $HOME/.celestia-app/config/app.toml
+sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"0\"/" $HOME/.celestia-app/config/app.toml
 
+# Настройка внешнего адреса
 EXTERNAL_ADDRESS=$(wget -qO- eth0.me)
 sed -i.bak -e "s/^external-address = \"\"/external-address = \"$EXTERNAL_ADDRESS:26656\"/" $HOME/.celestia-app/config/config.toml
 
+# Настройка минимальных цен на газ и Prometheus
 sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0.002utia\"/" $HOME/.celestia-app/config/app.toml
 sed -i -e "s/prometheus = false/prometheus = true/" $HOME/.celestia-app/config/config.toml
 sed -i -e "s/^indexer *=.*/indexer = \"null\"/" $HOME/.celestia-app/config/config.toml
 
+# Сброс состояния узла
 celestia-appd tendermint unsafe-reset-all --home $HOME/.celestia-app 
 
+# Создание сервиса для celestia-appd
 sudo tee /etc/systemd/system/celestia-appd.service > /dev/null <<EOF
 [Unit]
 Description=celestia
@@ -96,9 +103,10 @@ LimitNOFILE=65535
 WantedBy=multi-user.target
 EOF
 
+# Установка снапшота и инициализация данных
 cd $HOME
 sudo apt install lz4 -y
 
+# Перезагрузка и запуск сервиса
 sudo systemctl daemon-reload
 sudo systemctl enable celestia-appd
-sudo systemctl restart celestia-appd && sudo journalctl -u celestia-appd -f
