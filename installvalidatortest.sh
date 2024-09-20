@@ -29,7 +29,9 @@ git clone https://github.com/celestiaorg/celestia-app.git
 cd celestia-app/ 
 APP_VERSION=v2.1.2
 git checkout tags/$APP_VERSION -b $APP_VERSION 
+make build
 make install
+
 
 cd $HOME
 rm -rf networks
