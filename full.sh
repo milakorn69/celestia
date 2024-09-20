@@ -110,3 +110,4 @@ sudo apt install lz4 -y
 # Перезагрузка и запуск сервиса
 sudo systemctl daemon-reload
 sudo systemctl enable celestia-appd
+sudo systemctl restart celestia-appd && sudo journalctl -u celestia-appd -f
