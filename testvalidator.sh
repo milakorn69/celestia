@@ -51,8 +51,9 @@ cd celestia-app/
 APP_VERSION=v2.1.2
 git checkout tags/$APP_VERSION -b $APP_VERSION
 
-# Исправление модуля cmp в go.mod
+# Исправление зависимостей в go.mod
 go mod edit -replace cmp=github.com/google/go-cmp@v0.5.8
+go mod edit -droprequire testing/slogtest
 
 # Очистка зависимостей и обновление go.mod
 go mod tidy
