@@ -4,6 +4,33 @@
 sudo apt update && sudo apt upgrade -y
 sudo apt install curl git wget htop tmux build-essential jq make gcc lz4 -y
 
+# Установка последней версии Go
+GO_VERSION="1.21.1"
+GO_TAR="go$GO_VERSION.linux-amd64.tar.gz"
+GO_URL="https://golang.org/dl/$GO_TAR"
+
+# Удаление старой версии Go
+if [ -d "/usr/local/go" ]; then
+    echo "Removing old Go version..."
+    sudo rm -rf /usr/local/go
+fi
+
+# Скачивание и установка новой версии Go
+echo "Installing Go $GO_VERSION..."
+wget $GO_URL
+sudo tar -C /usr/local -xzf $GO_TAR
+rm $GO_TAR
+
+# Обновление переменной PATH
+if ! grep -q "/usr/local/go/bin" <<< "$PATH"; then
+    echo "Updating PATH..."
+    echo "export PATH=\$PATH:/usr/local/go/bin:~/go/bin" >> ~/.bash_profile
+    source ~/.bash_profile
+fi
+
+# Проверка версии Go
+go version
+
 # Переменные окружения для Celestia
 CELESTIA_PORT=26
 WALLET='ERN'
@@ -15,20 +42,6 @@ echo "export MONIKER='${MONIKER}'" >> $HOME/.bash_profile
 echo "export CHAIN_ID='${CHAIN_ID}'" >> $HOME/.bash_profile
 echo "export CELESTIA_PORT='${CELESTIA_PORT}'" >> $HOME/.bash_profile
 source $HOME/.bash_profile
-
-# Установка последней версии Go
-if ! [ -x "$(command -v go)" ]; then
-    GO_VERSION="1.21.1"
-    wget "https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz"
-    sudo rm -rf /usr/local/go
-    sudo tar -C /usr/local -xzf "go$GO_VERSION.linux-amd64.tar.gz"
-    rm "go$GO_VERSION.linux-amd64.tar.gz"
-    echo "export PATH=\$PATH:/usr/local/go/bin:~/go/bin" >> ~/.bash_profile
-    source ~/.bash_profile
-fi
-
-# Проверка версии Go
-go version
 
 # Скачивание и установка Celestia
 cd $HOME
