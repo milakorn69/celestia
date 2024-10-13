@@ -6,46 +6,46 @@
 
 Official documentation:
 >- [Validator setup instructions](https://docs.celestia.org/nodes/consensus-node)
-# upgrade celestia app
+# 📋 Upgrade celestia app
 ~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/upgradeapp.sh)
 ~~~
-# upgrade celestia node
+# 📋 Upgrade celestia node
 ~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/upgradenode.sh)
 ~~~
-# install test validator
+# 🛠️ Install test validator
 ~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installvalidatortest.sh)
 ~~~
-# install main validator
+# 🛠️ Install main validator
 ~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installvalidatormain.sh)
 ~~~
-# install full test node
+# 🛠️ Install full test node
 ~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installfulltest.sh)
 ~~~
-# install full main node
+# 🛠️ Install full main node
 ~~~bash
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installfullmain.sh)
 ~~~
-# install test bridge
+# 🛠️ Install test bridge
 ~~~bash 
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installbridgetest.sh)
 ~~~
-# install main bridge
+# 🛠️ Install main bridge
 ~~~bash 
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installbridgemain.sh)
 ~~~
-# install monitoring
+# 🛠️ Install monitoring
 ~~~bash 
 source <(curl -s https://raw.githubusercontent.com/ERNcrypto/celestia/main/installmonitoring.sh)
 ~~~
 
 
 
-### Firewall security
+### 🧑‍💻 Firewall security
 Set the default to allow outgoing connections, deny all incoming, allow ssh and node p2p port
   ~~~bash
   sudo ufw enable 
