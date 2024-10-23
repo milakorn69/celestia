@@ -48,7 +48,7 @@ cd $HOME
 rm -rf celestia-app
 git clone https://github.com/celestiaorg/celestia-app.git
 cd celestia-app/
-APP_VERSION=v2.1.2
+APP_VERSION=v2.2.0-mocha
 git checkout tags/$APP_VERSION -b $APP_VERSION
 
 # Исправление зависимостей в go.mod
