@@ -91,6 +91,8 @@ LimitNOFILE=65535
 WantedBy=multi-user.target
 EOF
 
+sudo apt install lz4 -y
+
 curl -L https://snapshots.kjnodes.com/celestia/snapshot_latest.tar.lz4 | tar -Ilz4 -xf - -C $HOME/.celestia-app
 
 sudo systemctl daemon-reload
