@@ -31,6 +31,8 @@ APP_VERSION=v3.0.0-mocha
 git checkout tags/$APP_VERSION -b $APP_VERSION 
 make build
 make install
+make configure-v3
+make enable-bbr
 
 
 cd $HOME
